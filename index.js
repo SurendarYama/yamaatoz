@@ -1,24 +1,22 @@
 import { createServer } from "node:http";
-import path from "node:path";
 import pug from "pug";
-
-const SELECTED_THEME = async () => {
+let compiledFunction;
+const boot = async () => {
   try {
     const selectedThemeconfig = await fetch(
       "http://localhost:3000/get-theme-config",
     );
     const selectedThemeData = await selectedThemeconfig.json();
 
-    return "./themes/" + selectedThemeData.themeUrl + "/views/index.pug";
+    const selectedThemeUrl =
+      "./themes/" + selectedThemeData.themeUrl + "/views/index.pug";
+    compiledFunction = pug.compileFile(selectedThemeUrl);
   } catch (err) {
     console.log(err);
   }
 };
 
-console.log(">theme_url: ", SELECTED_THEME());
-const compiledFunction = pug.compileFile(
-  "./themes/" + "2025" + "/views/index.pug",
-);
+boot();
 
 const server = createServer((req, res) => {
   switch (req.url) {
@@ -26,7 +24,6 @@ const server = createServer((req, res) => {
       const html = compiledFunction({
         title: "Home Page",
         message: "Home Page Content",
-        styleUrl: "./themes/2025/styles.css",
       });
       res.writeHead(200, { "Content-Type": "text/html" });
       res.end(html);
@@ -41,7 +38,7 @@ const server = createServer((req, res) => {
       return;
     case "/get-theme-config":
       res.writeHead(200, { "Content-Type": "application/json" });
-      res.end(JSON.stringify({ themeUrl: "2025" }));
+      res.end(JSON.stringify({ themeUrl: "2024" }));
       return;
     default:
       res.writeHead(404, { "Content-Type": "text/html" });
