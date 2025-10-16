@@ -1,5 +1,6 @@
 import { createServer } from "node:http";
 import pug from "pug";
+
 let compiledFunction;
 const boot = async () => {
   try {
@@ -11,6 +12,7 @@ const boot = async () => {
     const selectedThemeUrl =
       "./themes/" + selectedThemeData.themeUrl + "/views/index.pug";
     compiledFunction = pug.compileFile(selectedThemeUrl);
+    await import("./themes/" + selectedThemeData.themeUrl + "/index.js");
   } catch (err) {
     console.log(err);
   }
